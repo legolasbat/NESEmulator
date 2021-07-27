@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "Utils.h"
-#include "Memory.h"
 
 #define CBit 0x01
 #define ZBit 0x02
@@ -15,10 +14,12 @@
 #define VBit 0x40
 #define NBit 0x80
 
+class NES;
+
 class CPU {
 public:
 	CPU();
-	void ConnectMemory(Memory *mem);
+	void ConnectMemory(NES* mem) { memory = mem; }
 	void Clock();
 	void Reset();
 	void IRQ();
@@ -50,7 +51,7 @@ private:
 	int cycles = 7;
 	int tCycles = 0;
 
-	Memory *memory;
+	NES *memory = nullptr;
 	
 	unWord dir = 0x0000;
 	unWord relDir = 0x0000;

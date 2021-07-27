@@ -1,14 +1,15 @@
-#include "Memory.h"
+#include "NES.h"
 
 #include <fstream>
 #include <iostream>
 
-void Memory::Load(const char* game)
+void NES::InsertCart(Cartridge* game)
 {
-	cart = new Cartridge(game);
+	cart = game;
+	ppu.ConnectMemory(game);
 }
 
-void Memory::CPUWrite(unWord dir, unByte b)
+void NES::CPUWrite(unWord dir, unByte b)
 {
 	//std::cout << "Writing Byte in Address: " << std::hex << dir << " Value: " << std::hex << (int)b << std::endl;
 	if (dir >= 0 && dir < 0x8000) {
@@ -26,7 +27,7 @@ void Memory::CPUWrite(unWord dir, unByte b)
 		std::cout << "Trying to write in ROM" << std::endl;
 }
 
-unByte Memory::CPURead(unWord dir)
+unByte NES::CPURead(unWord dir)
 {
 	unByte val;
 	bool isCart = false;
@@ -41,7 +42,7 @@ unByte Memory::CPURead(unWord dir)
 	return val;
 }
 
-void Memory::CPUWriteW(unWord dir, unWord w)
+void NES::CPUWriteW(unWord dir, unWord w)
 {
 	//std::cout << "Writing Word in Address: " << std::hex << dir << " Value: " << std::hex << (int)w << std::endl;
 	if (dir >= 0 && dir < 0x7fff) {
@@ -56,7 +57,7 @@ void Memory::CPUWriteW(unWord dir, unWord w)
 	
 }
 
-unWord Memory::CPUReadW(unWord dir)
+unWord NES::CPUReadW(unWord dir)
 {
 	unWord val;
 	bool isCart = false;
@@ -73,21 +74,4 @@ unWord Memory::CPUReadW(unWord dir)
 
 	//std::cout << "Reading Word in " << (cart ? "Address in file: " : "Address: ") << std::hex << (isCart ? (dir & 0x7fff) : dir) << " Value: " << std::hex << (int)val << std::endl;
 	return val;
-}
-
-unByte Memory::PPURead(unWord dir) {
-	if (dir >= 0 && dir < 0x2000) {
-		return cart->PPURead(dir);
-	}
-	else {
-		std::cout << "Not handle PPU read" << std::endl;
-		return 0;
-	}
-}
-
-void Memory::PrintMemory() {
-	for (int i = 0; i < 32768; i++) {
-		std::cout << std::hex << i << ": " << std::hex << memory[i];
-	}
-	std::cout << std::endl;
 }

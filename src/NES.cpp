@@ -4,21 +4,13 @@
 #include <iostream>
 
 NES::NES() {
-	cpu = new CPU();
-	cpu->ConnectMemory(&cpuMem);
-	ppu = new PPU();
-	ppu->ConnectMemory(&cpuMem);
-}
-
-void NES::Load(const char* game) {
-	cpuMem.Load(game);
+	cpu.ConnectMemory(this);
 }
 
 void NES::Clock() {
-	cpu->Clock();
+	cpu.Clock();
 }
 
 void NES::PourMemory() {
-	//cpuMem.PrintMemory();
-	ppu->PrintTable();
+	ppu.PrintTable();
 }

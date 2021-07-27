@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 Cartridge::Cartridge(const char* game) {
 	// iNES Format Header
@@ -21,6 +22,7 @@ Cartridge::Cartridge(const char* game) {
 	std::ifstream ifs;
 	ifs.open(game, std::ifstream::binary);
 	if (ifs.is_open()) {
+
 		ifs.read((char*)&header, sizeof(sHeader));
 
 		std::cout << header.name[0] << header.name[1] << header.name[2] << std::endl;

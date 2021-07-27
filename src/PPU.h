@@ -1,23 +1,37 @@
 #pragma once
 
-#include "Memory.h"
+#include "Cartridge.h"
 
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 128;	// 256				128 Palette Table
-const int SCREEN_HEIGHT = 256;	// 224 NTSC 240 PAL	256 Palette Table
+const int SCREEN_WIDTH = 128;	// 256
+const int SCREEN_HEIGHT = 240;	// 224 NTSC 240 PAL
 const int ZOOM = 3; // 3 Palette Table 50 Single Sprite
+
+const int PATTERN_WIDTH = 128; // 256
+const int PATTERN_HEIGHT = 256;
 
 class PPU
 {
 public:
-	void ConnectMemory(Memory *mem);
+	PPU();
+	~PPU();
+
+	void ConnectMemory(Cartridge *mem);
+
+	void PPUWrite(unWord dir, unByte b);
+	unByte PPURead(unWord dir);
+
+	void GetPatternTab();
+	void GetSprite(int i);
 	void PrintTable();
 
 private:
-	Memory *memory;
+	Cartridge *cart = nullptr;
+
+	unByte PatternTab[2][4096];	// Two tables of 0x1000 bytes
 
 	Uint32 Palettes[0x40] ={
 							0x757575, 0x271b8f, 0x0000ab, 0x47009f, 0x8f0077, 0xab0013, 0xa70000, 0x7f0b00, 0x432f00, 0x004700, 0x005100, 0x003f17, 0x1b3f5f, 0x000000, 0x000000, 0x000000,
