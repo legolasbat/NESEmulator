@@ -16,14 +16,16 @@ public:
 
 	void CPUWrite(unWord dir, unByte b);
 	unByte CPURead(unWord dir);
-	void CPUWriteW(unWord dir, unWord w);
-	unWord CPUReadW(unWord dir);
 
 private:
 
-	unByte memory[0x8000];
+	int clockCounter = 0;
 
-	Cartridge* cart;
+	unByte memory[0x800];
+
+	unByte controller[2];
+
+	Cartridge* cart = nullptr;
 
 	CPU cpu;
 	PPU ppu;

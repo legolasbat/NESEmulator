@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <iomanip>
 
 Cartridge::Cartridge(const char* game) {
 	// iNES Format Header

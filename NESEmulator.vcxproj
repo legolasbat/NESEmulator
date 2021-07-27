@@ -164,7 +164,6 @@
     <ClInclude Include="src\PPU.h" />
     <ClInclude Include="src\NES.h" />
     <ClInclude Include="src\CPU6502.h" />
-    <ClInclude Include="src\Memory.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

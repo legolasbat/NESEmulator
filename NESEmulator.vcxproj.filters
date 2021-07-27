@@ -44,9 +44,6 @@
     <ClInclude Include="src\Utils.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="src\Memory.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="src\NES.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>

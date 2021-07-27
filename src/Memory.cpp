@@ -11,16 +11,26 @@ void NES::InsertCart(Cartridge* game)
 
 void NES::CPUWrite(unWord dir, unByte b)
 {
-	//std::cout << "Writing Byte in Address: " << std::hex << dir << " Value: " << std::hex << (int)b << std::endl;
 	if (dir >= 0 && dir < 0x8000) {
 		if (dir >= 0 && dir < 0x2000) {
+			// RAM Range
 			memory[dir & 0x07ff] = b;
 		}
 		else if(dir >= 0x2000 && dir < 0x4000){
-			memory[dir & 0x0007] = b;
+			// PPU Range
+			ppu.CPUWrite(dir, b);
 		}
-		else {
-			memory[dir] = b;
+		else if((dir >= 0x4000 && dir <= 0x4013) || dir == 0x4015 || dir == 0x4017){
+			// APU Range
+			std::cout << "Trying to write in APU" << std::endl;
+		}
+		else if (dir == 0x4014) {
+			// DMA Transfer
+			std::cout << "DMA Transfer" << std::endl;
+		}
+		else if (dir >= 0x4016 && dir <= 0x4017) {
+			// Controller Range
+			std::cout << "Writing in controller?" << std::endl;
 		}
 	}
 	else
@@ -29,49 +39,27 @@ void NES::CPUWrite(unWord dir, unByte b)
 
 unByte NES::CPURead(unWord dir)
 {
-	unByte val;
-	bool isCart = false;
+	unByte val = 0;
 	if (dir >= 0 && dir < 0x8000)
-		val = memory[dir];
+		if (dir >= 0 && dir < 0x2000) {
+			// RAM Range
+			val = memory[dir & 0x07ff];
+		}
+		else if (dir >= 0x2000 && dir < 0x4000) {
+			// PPU Range
+			val = ppu.CPURead(dir & 0x0007);
+		}
+		else if (dir == 0x4015) {
+			// APU Range
+			std::cout << "Trying to read in APU" << std::endl;
+		}
+		else if (dir >= 0x4016 && dir <= 0x4017) {
+			// Controller Range
+			std::cout << "Reading from controller" << std::endl;
+		}
 	else {
 		val = cart->CPURead(dir);
-		isCart = true;
 	}
 
-	//std::cout << "Reading Byte in " << (cart ? "Address in file: " : "Address: ") << std::hex << (isCart ? (dir & 0x7fff) : dir) << " Value: " << std::hex << (int)val << std::endl;
-	return val;
-}
-
-void NES::CPUWriteW(unWord dir, unWord w)
-{
-	//std::cout << "Writing Word in Address: " << std::hex << dir << " Value: " << std::hex << (int)w << std::endl;
-	if (dir >= 0 && dir < 0x7fff) {
-		unByte v = w & 0x00ff;
-		memory[dir] = v;
-		v = (w & 0xff00) >> 8;
-		memory[dir + 1] = v;
-	}
-	else {
-		std::cout << "Trying to write in ROM" << std::endl;
-	}
-	
-}
-
-unWord NES::CPUReadW(unWord dir)
-{
-	unWord val;
-	bool isCart = false;
-	if (dir >= 0 && dir < 0x8000) {
-		val = memory[dir];
-		val = val | (memory[dir + 1] << 8);
-	}
-	else {
-		//unWord tempDir = dir & ((nPRGBanks > 1) ? 0x7fff : 0x3fff);
-		val = cart->CPURead(dir);
-		val = val | (cart->CPURead(dir + 1) << 8);
-		isCart = true;
-	}
-
-	//std::cout << "Reading Word in " << (cart ? "Address in file: " : "Address: ") << std::hex << (isCart ? (dir & 0x7fff) : dir) << " Value: " << std::hex << (int)val << std::endl;
 	return val;
 }

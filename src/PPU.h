@@ -21,6 +21,11 @@ public:
 
 	void ConnectMemory(Cartridge *mem);
 
+	void Clock();
+
+	void CPUWrite(unWord dir, unByte b);
+	unByte CPURead(unWord dir);
+
 	void PPUWrite(unWord dir, unByte b);
 	unByte PPURead(unWord dir);
 
@@ -28,7 +33,12 @@ public:
 	void GetSprite(int i);
 	void PrintTable();
 
+	bool NMI = false;
+
 private:
+	int cycles = 0;
+	int scanLine = 0;
+
 	Cartridge *cart = nullptr;
 
 	unByte PatternTab[2][4096];	// Two tables of 0x1000 bytes
@@ -41,5 +51,55 @@ private:
 							};
 
 	Uint32 Palette[4] = { Palettes[0x3f], Palettes[0x15], Palettes[0x2c], Palettes[0x07] };
+
+	// 0x2000
+	union PPUCTRL
+	{
+		struct
+		{
+			unByte NameTableX : 1;
+			unByte NameTableY : 1;
+			unByte IncMod : 1;
+			unByte PatternSprite : 1;
+			unByte PatternBackground : 1;
+			unByte SpriteSize : 1;
+			unByte SlaveMode : 1; // Unused
+			unByte EnableNMI : 1;
+		};
+
+		unByte reg;
+	} control;
+
+	// 0x2001
+	union PPUMASK
+	{
+		struct
+		{
+			uint8_t Grayscale : 1;
+			uint8_t RenderBackgroundLeft : 1;
+			uint8_t RenderSpritesLeft : 1;
+			uint8_t RenderBackground : 1;
+			uint8_t RenderSprites : 1;
+			uint8_t EmphasizeRed : 1;
+			uint8_t EmphasizeGreen : 1;
+			uint8_t EmphasizeBlue : 1;
+		};
+
+		uint8_t reg;
+	} mask;
+
+	// 0x2002
+	union PPUSTATUS
+	{
+		struct
+		{
+			uint8_t Unused : 5;
+			uint8_t SpriteOverflow : 1;
+			uint8_t SpriteZeroHit : 1;
+			uint8_t VerticalBlank : 1;
+		};
+
+		uint8_t reg;
+	} status;
 };
 
