@@ -1,6 +1,5 @@
 #include "Cartridge.h"
 
-#include <fstream>
 #include <iostream>
 
 Cartridge::Cartridge(const char* game) {
@@ -42,6 +41,16 @@ Cartridge::Cartridge(const char* game) {
 		std::cout << "Number of 16 KB PRG-ROM: " << (int)nPRGBanks << std::endl;
 		std::cout << "Number of 8 KB VROM: " << (int)nCHRBanks << std::endl;
 
+		switch (mapperID)
+		{
+		case 0:
+			mapper = std::make_shared<Mapper0>(nPRGBanks, nCHRBanks);
+			break;
+		default:
+			std::cout << "Mapper not defined: " << (int)mapperID << std::endl;
+			break;
+		}
+
 		PRGMemory.resize(nPRGBanks * 16384);
 		ifs.read((char*)PRGMemory.data(), PRGMemory.size());
 
@@ -55,10 +64,76 @@ Cartridge::Cartridge(const char* game) {
 	}
 }
 
-unByte Cartridge::CPURead(unWord dir) {
-	return PRGMemory[dir & ((nPRGBanks > 1) ? 0x7fff : 0x3fff)];
+bool Cartridge::CPUWrite(unWord dir, unByte b)
+{
+	int mappedDir = 0;
+
+	if (mapper->CPUMapWrite(dir, mappedDir, b)) {
+		if (mappedDir == 0xffffffff) {
+			return true;
+		}
+		else {
+			PRGMemory[mappedDir] = b;
+		}
+		return true;
+	}
+	else
+		return false;
 }
 
-unByte Cartridge::PPURead(unWord dir) {
-	return CHRMemory[dir];
+bool Cartridge::CPURead(unWord dir, unByte &b) {
+	int mappedDir = 0;
+
+	if (mapper->CPUMapRead(dir, mappedDir, b)) {
+		if (mappedDir == 0xffffffff) {
+			return true;
+		}
+		else {
+			b = PRGMemory[mappedDir];
+		}
+		return true;
+	}
+	else
+		return false;
+}
+
+bool Cartridge::PPUWrite(unWord dir, unByte b) {
+	int mappedDir = 0;
+
+	if (mapper->PPUMapWrite(dir, mappedDir)) {
+		CHRMemory[mappedDir] = b;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool Cartridge::PPURead(unWord dir, unByte &b) {
+	int mappedDir = 0;
+
+	if (mapper->PPUMapRead(dir, mappedDir)) {
+		b = CHRMemory[mappedDir];
+		return true;
+	}
+	else
+		return false;
+}
+
+void Cartridge::Reset() {
+	if (mapper != nullptr)
+		mapper->Reset();
+}
+
+MIRROR Cartridge::Mirror() {
+	MIRROR m = mapper->mirror();
+	if(m == MIRROR::HARDWARE) {
+		return HWMirror;
+	}
+	else {
+		return m;
+	}
+}
+
+std::shared_ptr<Mapper> Cartridge::GetMapper() {
+	return mapper;
 }

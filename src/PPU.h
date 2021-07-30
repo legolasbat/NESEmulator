@@ -2,16 +2,24 @@
 
 #include "Cartridge.h"
 
+#include <thread>
+
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 128;	// 256
+const int SCREEN_WIDTH = 256;	// 256
 const int SCREEN_HEIGHT = 240;	// 224 NTSC 240 PAL
 const int ZOOM = 3; // 3 Palette Table 50 Single Sprite
 
 const int PATTERN_WIDTH = 128; // 256
 const int PATTERN_HEIGHT = 256;
+
+const int ScanlineCycleLength = 341;
+const int ScanlineEndCycle = 340;
+const int VisibleScanlines = 240;
+const int ScanlineVisibleDots = 256;
+const int FrameEndScanline = 261;
 
 class PPU
 {
@@ -21,7 +29,13 @@ public:
 
 	void ConnectMemory(Cartridge *mem);
 
+	void Reset();
+
 	void Clock();
+
+	void SetPixel(int x, int y, Uint32 color);
+	Uint32 GetColorFromPalette(unByte palette);
+	void Draw();
 
 	void CPUWrite(unWord dir, unByte b);
 	unByte CPURead(unWord dir);
@@ -30,17 +44,40 @@ public:
 	unByte PPURead(unWord dir);
 
 	void GetPatternTab();
-	void GetSprite(int i);
-	void PrintTable();
+	void GetNameTab();
+	void GetSprite(int i, int p = -1);
+	void PrintTable(int t);
+
+	void DebugCycles();
 
 	bool NMI = false;
 
+	unByte* pOAM = (unByte*)OAM;
+
+	bool frameComplete = false;
+
 private:
+
+	std::thread screen;
+
+	enum State {
+		PreRender,
+		Render,
+		PostRender,
+		VerticalBlank
+	} pipelineState;
+
+	unWord dataAddr = 0;
+	unWord tempAddr = 0;
+
 	int cycles = 0;
 	int scanLine = 0;
+	bool oddFrame = false;
 
 	Cartridge *cart = nullptr;
 
+	unByte PaletteTab[0x20];
+	unByte NameTab[2][0x400];	// Two tables of 0x400 bytes
 	unByte PatternTab[2][4096];	// Two tables of 0x1000 bytes
 
 	Uint32 Palettes[0x40] ={
@@ -101,5 +138,74 @@ private:
 
 		uint8_t reg;
 	} status;
+
+	union REGISTER {
+		struct {
+			unWord coarseX : 5;
+			unWord coarseY : 5;
+			unWord nameTabX : 1;
+			unWord nameTabY : 1;
+			unWord fineY : 3;
+			unWord unused : 1;
+		};
+
+		unWord reg = 0;
+	};
+
+	REGISTER vramAddr;
+	REGISTER tramAddr;
+
+	unByte fineX = 0;
+
+	unByte addressLatch;
+	unByte PPUDataBuffer = 0;
+
+	unByte BGNextTileID = 0;
+	unByte BGNextTileAttr = 0;
+	unByte BGNextTileLsb = 0;
+	unByte BGNextTileMsb = 0;
+	unWord BGShifterPatternLo = 0;
+	unWord BGShifterPatternHi = 0;
+	unWord BGShifterAttrLo = 0;
+	unWord BGShifterAttrHi = 0;
+
+	struct ObjectAttrEntry {
+		unByte y;		// Y pos of sprite
+		unByte id;		// ID of tile
+		unByte attr;	// Flags for sprite
+		unByte x;		// X pos of sprite
+	} OAM[64];
+
+	unByte OAMAddress = 0;
+
+	ObjectAttrEntry spriteScanline[8];
+
+public:
+	std::vector<unByte> spriteMemory;
+
+private:
+	std::vector<unByte> scanlineSprites;
+	unByte spriteDataAddr = 0;
+
+	unByte spriteCount;
+	unByte spriteShifterPatternLo[8];
+	unByte spriteShifterPatternHi[8];
+
+	bool spriteZeroHitPossible = false;
+	bool spriteZeroBeingRendered = false;
+
+public:
+	int channels = 4; // for a RGBA image
+	int pitch = SCREEN_WIDTH * sizeof(unByte) * channels;
+	unByte* pixels = new unByte[SCREEN_WIDTH * SCREEN_HEIGHT * channels];
+
+private:
+	void IncrementScrollX();
+	void IncrementScrollY();
+	void TransferAddressX();
+	void TransferAddressY();
+	void LoadBackgroundShifters();
+	void UpdateShifters();
+	unByte FlipByte(unByte b);
 };
 

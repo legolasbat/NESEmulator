@@ -10,12 +10,18 @@ class NES
 public:
 	NES();
 	void InsertCart(Cartridge* game);
+	void Reset();
 	void Clock();
-
-	void PourMemory();
 
 	void CPUWrite(unWord dir, unByte b);
 	unByte CPURead(unWord dir);
+
+	void DebugPPU();
+
+	CPU cpu;
+	PPU ppu;
+
+	unByte controller[2];
 
 private:
 
@@ -23,11 +29,16 @@ private:
 
 	unByte memory[0x800];
 
-	unByte controller[2];
+	unByte controllerState[2];
 
 	Cartridge* cart = nullptr;
 
-	CPU cpu;
-	PPU ppu;
+	unByte DMAPage = 0;
+	unByte DMAAddr = 0;
+	unByte DMAData = 0;
+
+	bool DMA = true;
+
+	bool DMATransfer = false;
 };
 

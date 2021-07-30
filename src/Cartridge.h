@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Utils.h"
+#include "Mappers/Mapper0.h"
 
+#include <fstream>
 #include <vector>
 
 class Cartridge
@@ -9,12 +11,19 @@ class Cartridge
 public:
 	Cartridge(const char* game);
 
-	//void Write(unWord dir, unByte b);
-	unByte CPURead(unWord dir);
-	//void WriteW(unWord dir, unWord w);
-	//unWord ReadW(unWord dir);
 
-	unByte PPURead(unWord dir);
+
+	bool CPUWrite(unWord dir, unByte b);
+	bool CPURead(unWord dir, unByte &b);
+
+	bool PPUWrite(unWord dir, unByte b);
+	bool PPURead(unWord dir, unByte &b);
+
+	void Reset();
+
+	MIRROR Mirror();
+
+	std::shared_ptr<Mapper> GetMapper();
 
 private:
 
@@ -24,5 +33,9 @@ private:
 	unByte mapperID = 0;
 	unByte nPRGBanks = 0;
 	unByte nCHRBanks = 0;
+
+	MIRROR HWMirror = HORIZONTAL;
+
+	std::shared_ptr<Mapper> mapper;
 };
 

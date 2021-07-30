@@ -31,12 +31,13 @@ void CPU::Clock() {
 		// Fetch
 		op = Read(pc);
 
-		std::cout << std::hex << pc;
-		std::cout << "\t" << std::hex << (int)op << " " << optable[op].name;
-		std::cout << "\t\t" << "A:" << std::hex << (int)a << " X:" << std::hex << (int)x
-			<< " Y:" << std::hex << (int)y << " P:" << std::hex << (int)p
-			<< " SP:" << std::hex << (int)sp;
-		std::cout << "\t" << "CYC:" << std::dec << tCycles << std::endl;
+		//std::cout << std::hex << pc;
+		//std::cout << "\t" << std::hex << (int)op << " " << optable[op].name;
+		//std::cout << "\t\t" << "A:" << std::hex << (int)a << " X:" << std::hex << (int)x
+		//	<< " Y:" << std::hex << (int)y << " P:" << std::hex << (int)p
+		//	<< " SP:" << std::hex << (int)sp;
+		//std::cout << "\t" << "CYC:" << std::dec << tCycles;
+		//memory->DebugPPU();
 		
 		pc++;
 

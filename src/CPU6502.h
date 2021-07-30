@@ -24,9 +24,10 @@ public:
 	void Reset();
 	void IRQ();
 	void NMI();
+
 private:
 	// Registers
-	unWord pc = 0xc000;
+	unWord pc = 0x0000;
 	unByte a = 0, x = 0, y = 0, sp = 0xfd, p = 0x24;
 
 	void Push(unByte b);
