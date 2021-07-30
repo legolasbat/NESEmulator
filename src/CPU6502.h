@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <vector>
 
 #include "Utils.h"
@@ -24,6 +25,10 @@ public:
 	void Reset();
 	void IRQ();
 	void NMI();
+
+	void Debug();
+
+	std::stringstream debug;
 
 private:
 	// Registers

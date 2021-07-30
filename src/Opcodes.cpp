@@ -24,7 +24,7 @@ int CPU::ADC() {
 
 int CPU::AND() {
 	Fetch();
-	a = a & uTemp;
+	a &= uTemp;
 	CheckNeg(a);
 	CheckZero(a);
 	return 1;

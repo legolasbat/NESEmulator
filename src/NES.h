@@ -23,9 +23,9 @@ public:
 
 	unByte controller[2];
 
-private:
-
 	int clockCounter = 0;
+
+private:
 
 	unByte memory[0x800];
 

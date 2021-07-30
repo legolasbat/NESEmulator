@@ -3,6 +3,7 @@
 #include "NES.h"
 
 #include <iostream>
+#include <chrono>
 
 CPU::CPU() {
 	optable =
@@ -26,17 +27,23 @@ CPU::CPU() {
 	};
 }
 
+void CPU::Debug() {
+	std::cout << debug.str();
+	memory->DebugPPU();
+}
+
 void CPU::Clock() {
 	if (cycles == 0) {
 		// Fetch
 		op = Read(pc);
 
-		//std::cout << std::hex << pc;
-		//std::cout << "\t" << std::hex << (int)op << " " << optable[op].name;
-		//std::cout << "\t\t" << "A:" << std::hex << (int)a << " X:" << std::hex << (int)x
+		//debug.str("");
+		//debug << std::hex << pc;
+		//debug << "\t" << std::hex << (int)op << " " << optable[op].name;
+		//debug << "\t\t" << "A:" << std::hex << (int)a << " X:" << std::hex << (int)x
 		//	<< " Y:" << std::hex << (int)y << " P:" << std::hex << (int)p
 		//	<< " SP:" << std::hex << (int)sp;
-		//std::cout << "\t" << "CYC:" << std::dec << tCycles;
+		//debug << "\t" << "CYC:" << std::dec << tCycles;
 		//memory->DebugPPU();
 		
 		pc++;
@@ -45,6 +52,7 @@ void CPU::Clock() {
 
 		// Execute
 		int extraCycle1 = (this->*optable[op].addrmode)();
+
 		int extraCycle2 = (this->*optable[op].operate)();
 
 		cycles += extraCycle1 & extraCycle2;
@@ -132,22 +140,20 @@ unByte CPU::Read(unWord dir) {
 void CPU::WriteW(unWord dir, unWord w) {
 	Write(dir, w & 0xff);
 	Write(dir + 1, (w & 0xff00) >> 8);
-	//memory->CPUWriteW(dir, w);
 }
 
 unWord CPU::ReadW(unWord dir) {
 	unWord w = Read(dir);
 	w |= (Read(dir + 1) << 8);
 	return w;
-	//return memory->CPUReadW(dir);
 }
 
 void CPU::PSetBit(int pos) {
-	p = p | pos;
+	p |= pos;
 }
 
 void CPU::PResetBit(int pos) {
-	p = p & ~pos;
+	p &= ~pos;
 }
 
 bool CPU::PGetBit(int pos) {

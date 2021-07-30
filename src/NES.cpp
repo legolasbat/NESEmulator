@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <chrono>
 
 NES::NES() {
 	cpu.ConnectMemory(this);
@@ -18,6 +19,11 @@ void NES::Reset() {
 	DMA = true;
 	DMATransfer = false;
 }
+
+float fTimeCPU = 0.0f;
+float fTimePPU = 0.0f;
+float fTimeDMA = 0.0f;
+float fTimeNMI = 0.0f;
 
 void NES::Clock() {
 	ppu.Clock();
@@ -36,7 +42,6 @@ void NES::Clock() {
 					DMAData = CPURead(DMAPage << 8 | DMAAddr);
 				}
 				else {
-					//ppu.pOAM[DMAAddr] = DMAData;
 					ppu.spriteMemory[DMAAddr] = DMAData;
 					DMAAddr++;
 					if (DMAAddr == 0x00) {

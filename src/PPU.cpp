@@ -9,13 +9,6 @@ SDL_Texture* tabTexture;
 PPU::PPU() :
 	spriteMemory(64 * 4)
 {
-	////Initialize SDL
-	//if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	//{
-	//	printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-	//}
-
-	//screen = std::thread(SDLMain, this);
 }
 
 PPU::~PPU() {
@@ -280,13 +273,6 @@ void PPU::SetPixel(int x, int y, Uint32 color) {
 
 	unByte RGB[] = { (color >> 16) & 0xff, (color >> 8) & 0xff , color & 0xff };
 
-	if (color == 0xff77b7 && x < 8 && y < 8) {
-		std::cout << "WHY?!" << std::endl;
-	}
-
-	//if(x < 8 && y < 8)
-	//	std::cout << "X: " << x << " Y: " << y << " Color: " << std::hex << +color << std::endl;
-
 	pixels[(y * SCREEN_WIDTH * channels) + (x * channels)] = 0;
 	pixels[(y * SCREEN_WIDTH * channels) + (x * channels) + 1] = RGB[2];
 	pixels[(y * SCREEN_WIDTH * channels) + (x * channels) + 2] = RGB[1];
@@ -295,40 +281,6 @@ void PPU::SetPixel(int x, int y, Uint32 color) {
 
 Uint32 PPU::GetColorFromPalette(unByte palette) {
 	return Palettes[PPURead(0x3f00 + palette) & 0x3f];
-}
-
-void PPU::Draw() {
-
-	int count = 0;
-
-	for (int r = 0; r < SCREEN_HEIGHT; r++) {
-		for (int col = 0; col < SCREEN_WIDTH; col++) {
-			unWord tile_nr = PPURead(0x2000 + (r / 8 * 32) + (col / 8));
-			//std::cout << "Tile_nr: " << +tile_nr << std::endl;
-			//unWord tile_attr = PPURead(0);
-
-			unWord adr = (control.PatternBackground ? 0x1000 : 0) + (tile_nr * 0x10) + (r % 8);
-
-			if (adr == 0x0000) {
-				count++;
-			}
-			else {
-				//std::cout << "Count: " << count << std::endl;
-				count = 0;
-			}
-
-			//std::cout << "ADR: " << +adr << std::endl;
-
-			unWord pixel = ((PPURead(adr) >> (7 - (col % 8))) & 1) + (((PPURead(adr + 8) >> (7 - (col % 8))) & 1) * 2);
-			
-			unByte RGB[] = { (Palette[pixel] >> 16) & 0xff, (Palette[pixel] >> 8) & 0xff , Palette[pixel] & 0xff };
-			
-			pixels[(r * SCREEN_WIDTH * channels) + (col * channels)] = 0;
-			pixels[(r * SCREEN_WIDTH * channels) + (col * channels) + 1] = RGB[2];
-			pixels[(r * SCREEN_WIDTH * channels) + (col * channels) + 2] = RGB[1];
-			pixels[(r * SCREEN_WIDTH * channels) + (col * channels) + 3] = RGB[0];
-		}
-	}
 }
 
 void PPU::DebugCycles() {
@@ -461,10 +413,6 @@ unByte PPU::CPURead(unWord dir) {
 void PPU::PPUWrite(unWord dir, unByte b) {
 	dir &= 0x3fff;
 
-	//if (dir >= 0x2000) {
-	//	std::cout << "name tables: " << std::hex << +dir << std::endl;
-	//}
-
 	if (cart->PPUWrite(dir, b)) {
 
 	}
@@ -588,8 +536,7 @@ void PPU::GetNameTab() {
 			unWord adr = (control.PatternBackground ? 0x1000 : 0) + (r % 8) + tile_nr * 0x10;
 
 			unByte pixel = ((PPURead(adr) >> (7 - (col % 8))) & 1) + (((PPURead(adr + 8) >> (7 - (col % 8))) & 1) * 2);
-			//unByte pixel = ((PatternTab[(adr & 0x1000) >> 12][adr & 0x0fff] >> (7 - (col % 8))) & 1) + ((PatternTab[((adr + 8) & 0x1000) >> 12][(adr + 8) & 0x0fff] >> (7 - (col % 8))) & 1) * 2;
-
+			
 			unByte RGB[] = { (Palette[pixel] >> 16) & 0xff, (Palette[pixel] >> 8) & 0xff , Palette[pixel] & 0xff };
 
 			TabPixels[(r * SCREEN_WIDTH * channels) + (col * channels)] = 0x00;
@@ -600,50 +547,6 @@ void PPU::GetNameTab() {
 	}
 
 	SDL_UpdateTexture(tabTexture, NULL, TabPixels, TabPitch);
-}
-
-void PPU::GetSprite(int i, int p) {
-	int channels = 4; // for a RGBA image
-	int pitch = 8 * sizeof(unByte) * channels;
-	unByte* pixels = new unByte[8 * 8 * channels];
-
-	unWord dir = (((p == -1) ? i : p) * 0x10);
-	unByte lo;
-	unByte hi;
-
-	for (int r = 0; r < 8; r++) {
-
-		lo = PatternTab[(dir & 0x1000) >> 12][dir & 0x0fff];
-		hi = PatternTab[((dir + 8) & 0x1000) >> 12][(dir + 8) & 0x0fff];
-
-		//std::bitset<8> x(lo);
-		//std::bitset<8> y(hi);
-		//std::cout << "Low: " << x << std::endl;
-		//std::cout << "High: " << y << std::endl;
-
-		for (int c = 0; c < 8; c++) {
-
-			unByte pixel = ((lo >> (7 - (c % 8))) & 1) + (((hi >> (7 - (c % 8))) & 1) * 2);
-
-			//std::cout << "Pixel: " << +pixel << " ";
-
-			unByte RGB[] = { (Palette[pixel] >> 16) & 0xff, (Palette[pixel] >> 8) & 0xff , Palette[pixel] & 0xff };
-
-			pixels[(r * 8 * channels) + (c * channels)] = 0x00;
-			pixels[(r * 8 * channels) + (c * channels) + 1] = RGB[2];
-			pixels[(r * 8 * channels) + (c * channels) + 2] = RGB[1];
-			pixels[(r * 8 * channels) + (c * channels) + 3] = RGB[0];
-		}
-		//std::cout << std::endl;
-		//std::cout << std::endl;
-		dir++;
-	}
-
-	for (int k = 0; k < 64; k++) {
-		std::cout << "X: " << +OAM[k].x << " Y: " << +OAM[k].y << " ID: " << +OAM[k].id << " ATTR: " << +OAM[k].attr << std::endl;
-	}
-
-	SDL_UpdateTexture(tabTexture, NULL, pixels, pitch);
 }
 
 void PPU::PrintTable(int t) {
@@ -703,9 +606,6 @@ void PPU::PrintTable(int t) {
 	}
 	else if (t == 1) {
 		GetPatternTab();
-	}
-	else {
-		GetSprite(0);
 	}
 
 	while(true)

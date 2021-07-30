@@ -2,8 +2,6 @@
 
 #include "Cartridge.h"
 
-#include <thread>
-
 #define SDL_MAIN_HANDLED
 #include "SDL.h"
 
@@ -35,7 +33,6 @@ public:
 
 	void SetPixel(int x, int y, Uint32 color);
 	Uint32 GetColorFromPalette(unByte palette);
-	void Draw();
 
 	void CPUWrite(unWord dir, unByte b);
 	unByte CPURead(unWord dir);
@@ -45,7 +42,6 @@ public:
 
 	void GetPatternTab();
 	void GetNameTab();
-	void GetSprite(int i, int p = -1);
 	void PrintTable(int t);
 
 	void DebugCycles();
@@ -57,8 +53,6 @@ public:
 	bool frameComplete = false;
 
 private:
-
-	std::thread screen;
 
 	enum State {
 		PreRender,
@@ -198,14 +192,5 @@ public:
 	int channels = 4; // for a RGBA image
 	int pitch = SCREEN_WIDTH * sizeof(unByte) * channels;
 	unByte* pixels = new unByte[SCREEN_WIDTH * SCREEN_HEIGHT * channels];
-
-private:
-	void IncrementScrollX();
-	void IncrementScrollY();
-	void TransferAddressX();
-	void TransferAddressY();
-	void LoadBackgroundShifters();
-	void UpdateShifters();
-	unByte FlipByte(unByte b);
 };
 
