@@ -60,6 +60,9 @@ int main(void) {
 	SDL_Event event;
 	bool play = true;
 
+	std::chrono::high_resolution_clock::time_point end;
+	std::chrono::high_resolution_clock::time_point begin = std::chrono::high_resolution_clock::now();
+
 	while (play)
 	{
 		nes.Clock();
@@ -123,6 +126,10 @@ int main(void) {
 			SDL_RenderCopy(renderer, texture, NULL, NULL);
 			SDL_RenderPresent(renderer);
 			nes.ppu.frameComplete = false;
+
+			end = std::chrono::high_resolution_clock::now();
+			std::cout << "Time frame = " << std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count() << "[ms]" << std::endl;
+			begin = std::chrono::high_resolution_clock::now();
 		}
 	}
 	//Destroy texture

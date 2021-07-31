@@ -274,7 +274,7 @@ int CPU::DEY() {
 
 int CPU::EOR() {
 	Fetch();
-	a = a ^ uTemp;
+	a ^= uTemp;
 	CheckNeg(a);
 	CheckZero(a);
 	return 1;
@@ -360,7 +360,7 @@ int CPU::NOP() {
 
 int CPU::ORA() {
 	Fetch();
-	a = a | uTemp;
+	a |= uTemp;
 	CheckNeg(a);
 	CheckZero(a);
 	return 1;

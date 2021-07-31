@@ -20,11 +20,6 @@ void NES::Reset() {
 	DMATransfer = false;
 }
 
-float fTimeCPU = 0.0f;
-float fTimePPU = 0.0f;
-float fTimeDMA = 0.0f;
-float fTimeNMI = 0.0f;
-
 void NES::Clock() {
 	ppu.Clock();
 

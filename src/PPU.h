@@ -154,15 +154,6 @@ private:
 	unByte addressLatch;
 	unByte PPUDataBuffer = 0;
 
-	unByte BGNextTileID = 0;
-	unByte BGNextTileAttr = 0;
-	unByte BGNextTileLsb = 0;
-	unByte BGNextTileMsb = 0;
-	unWord BGShifterPatternLo = 0;
-	unWord BGShifterPatternHi = 0;
-	unWord BGShifterAttrLo = 0;
-	unWord BGShifterAttrHi = 0;
-
 	struct ObjectAttrEntry {
 		unByte y;		// Y pos of sprite
 		unByte id;		// ID of tile
@@ -172,8 +163,6 @@ private:
 
 	unByte OAMAddress = 0;
 
-	ObjectAttrEntry spriteScanline[8];
-
 public:
 	std::vector<unByte> spriteMemory;
 
@@ -182,8 +171,6 @@ private:
 	unByte spriteDataAddr = 0;
 
 	unByte spriteCount;
-	unByte spriteShifterPatternLo[8];
-	unByte spriteShifterPatternHi[8];
 
 	bool spriteZeroHitPossible = false;
 	bool spriteZeroBeingRendered = false;

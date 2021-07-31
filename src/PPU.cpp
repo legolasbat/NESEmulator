@@ -34,14 +34,6 @@ void PPU::Reset() {
 	PPUDataBuffer = 0;
 	scanLine = 0;
 	cycles = 0;
-	BGNextTileID = 0;
-	BGNextTileAttr = 0;
-	BGNextTileLsb = 0;
-	BGNextTileMsb = 0;
-	BGShifterPatternLo = 0;
-	BGShifterPatternHi = 0;
-	BGShifterAttrLo = 0;
-	BGShifterAttrHi = 0;
 	status.reg = 0;
 	mask.reg = 0;
 	control.reg = 0;
@@ -240,7 +232,6 @@ void PPU::Clock() {
 			cycles = 0;
 			pipelineState = VerticalBlank;
 
-			// Perhaps
 			frameComplete = true;
 		}
 		break;
