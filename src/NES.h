@@ -3,6 +3,7 @@
 #include "Utils.h"
 #include "CPU6502.h"
 #include "PPU.h"
+#include "APU.h"
 #include "Cartridge.h"
 
 class NES
@@ -20,6 +21,7 @@ public:
 
 	CPU cpu;
 	PPU ppu;
+	APU apu;
 
 	unByte controller[2];
 

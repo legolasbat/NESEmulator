@@ -24,7 +24,8 @@ void NES::CPUWrite(unWord dir, unByte b)
 	}
 	else if(dir <= 0x4013 || dir == 0x4015 || dir == 0x4017){
 		// APU Range
-		//apu.CPUWrite(dir, b);
+		//std::cout << "Dir: " << +dir << " Value: " << +b << std::endl;
+		apu.CPUWrite(dir, b);
 	}
 	else if (dir == 0x4014) {
 		// DMA Transfer
@@ -55,7 +56,7 @@ unByte NES::CPURead(unWord dir)
 	}
 	else if (dir == 0x4015) {
 		// APU Range
-		//val = apu.CPURead(dir);
+		val = apu.CPURead(dir);
 	}
 	else if (dir <= 0x4017) {
 		// Controller Range

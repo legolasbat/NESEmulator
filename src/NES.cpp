@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <chrono>
+#include <future>
 
 NES::NES() {
 	cpu.ConnectMemory(this);
@@ -23,7 +24,21 @@ void NES::Reset() {
 void NES::Clock() {
 	ppu.Clock();
 
+	//if (apu.isQueue) {
+	//	using namespace std::chrono_literals;
+	//	auto status = apu.queue.wait_for(0ms);
+	//
+	//	if (status == std::future_status::ready) {
+	//
+	//	}
+	//	else {
+	//		apu.queue.get();
+	//	}
+	//	apu.isQueue = false;
+	//}
+
 	// APU Clock
+	apu.Clock();
 
 	if (clockCounter % 3 == 0) {
 		if (DMATransfer) {

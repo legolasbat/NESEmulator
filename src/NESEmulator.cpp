@@ -6,6 +6,23 @@
 #include <chrono>
 #include "SDL.h"
 
+//#define PI2 6.28318530718
+//
+//float fTime = 0;
+//
+//static void callback(void* userdate, Uint8* stream, int len) {
+//	Sint16* stream16 = (Sint16*)stream;
+//
+//	int nb_samples = len / sizeof(Sint16);
+//	for (int i = 0; i < nb_samples; i++) {
+//		stream16[i] = 32000 * sin(fTime);
+//
+//		fTime += 440.0 * PI2 / 44100.0;
+//		if (fTime >= PI2)
+//			fTime -= PI2;
+//	}
+//}
+
 int main(void) {
 
 	//Initialize SDL
@@ -34,13 +51,33 @@ int main(void) {
 
 	SDL_FreeSurface(surface);
 
+
+	//// Audio
+	//SDL_Init(SDL_INIT_AUDIO);
+	//
+	//SDL_AudioDeviceID audio_device;
+	//
+	//SDL_AudioSpec audio_spec = { 0 };
+	//audio_spec.freq = 44100;
+	//audio_spec.format = AUDIO_S16SYS;
+	//audio_spec.channels = 1;
+	//audio_spec.samples = 4096;
+	//audio_spec.callback = callback;
+	//audio_spec.userdata = NULL;
+	//
+	//audio_device = SDL_OpenAudioDevice(NULL, 0, &audio_spec, NULL, 0);
+	//
+	//SDL_PauseAudioDevice(audio_device, 0);
+	//// End audio
+
+
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 
 	// Create texture
 	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	//Cartridge* cart = new Cartridge("nestest.nes");
-	Cartridge* cart = new Cartridge("Donkey Kong.nes");
+	Cartridge* cart = new Cartridge("nestest.nes");
+	//Cartridge* cart = new Cartridge("Donkey Kong.nes");
 	//Cartridge* cart = new Cartridge("Excitebike.nes");
 
 	NES nes;

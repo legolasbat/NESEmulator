@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\APU.cpp" />
     <ClCompile Include="src\Mappers\Mapper0.cpp" />
     <ClCompile Include="src\Mappers\Mapper.cpp" />
     <ClCompile Include="src\Cartridge.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="src\Opcodes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\APU.h" />
     <ClInclude Include="src\Mappers\Mapper0.h" />
     <ClInclude Include="src\Mappers\Mapper.h" />
     <ClInclude Include="src\Cartridge.h" />
